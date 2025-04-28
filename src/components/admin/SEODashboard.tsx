@@ -61,8 +61,12 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
+        // Ensure favicon is loaded from localStorage or fallback to default
+        if (!parsed.favicon || parsed.favicon === '') {
+          parsed.favicon = defaultSEOSettings.favicon;
+        }
         setSettings(parsed);
-        setIsMetaTagsUpdated(true); // Trigger initial meta tags update
+        setIsMetaTagsUpdated(true);
       } catch (err) {
         console.error('Error parsing saved settings:', err);
         setSettings(defaultSEOSettings);
@@ -88,12 +92,21 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
         return;
       }
 
+      // Pre-load the image to ensure it's valid
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result;
         if (typeof result === 'string') {
-          setSettings(prev => ({ ...prev, favicon: result }));
-          setIsMetaTagsUpdated(true); // Trigger meta tags update
+          // Create an image element to test the file
+          const img = new Image();
+          img.onload = () => {
+            setSettings(prev => ({ ...prev, favicon: result }));
+            setIsMetaTagsUpdated(true);
+          };
+          img.onerror = () => {
+            setError('Invalid image file');
+          };
+          img.src = result;
         }
       };
       reader.onerror = () => {
@@ -107,17 +120,14 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   const handleSave = () => {
     try {
+      // Ensure we have a valid favicon
+      if (!settings.favicon || settings.favicon === '') {
+        setSettings(prev => ({ ...prev, favicon: defaultSEOSettings.favicon }));
+      }
+      
       localStorage.setItem('seoSettings', JSON.stringify(settings));
       setIsSaved(true);
-      setIsMetaTagsUpdated(true); // Trigger meta tags update
-      
-      // Force favicon refresh
-      const links = document.getElementsByTagName('link');
-      for (let i = 0; i < links.length; i++) {
-        if (links[i].rel === 'icon' || links[i].rel === 'shortcut icon') {
-          links[i].href = settings.favicon + '?v=' + new Date().getTime();
-        }
-      }
+      setIsMetaTagsUpdated(true);
     } catch (err) {
       setError('Failed to save settings');
     }
@@ -125,7 +135,7 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   const handleReset = () => {
     setSettings(defaultSEOSettings);
-    setIsMetaTagsUpdated(true); // Trigger meta tags update
+    setIsMetaTagsUpdated(true);
   };
 
   return (
