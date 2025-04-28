@@ -1,9 +1,38 @@
 import { Box, Container, Typography, Paper, Stack } from '@mui/material';
 import NonogramGenerator from './NonogramGenerator';
+import MetaTags from './MetaTags';
+import { useEffect, useState } from 'react';
 
 const LandingPage = () => {
+  const [seoSettings, setSeoSettings] = useState({
+    title: 'Nonogram Generator - Create Custom Picture Puzzles',
+    description: 'Transform your images into engaging nonogram puzzles with our free online tool. Create, customize, and download your puzzles in multiple formats.',
+    keywords: 'nonogram, nonogram generator, picture puzzle, puzzle maker, nonogram creator',
+    ogTitle: 'Nonogram Generator | Create Custom Picture Puzzles Online',
+    ogDescription: 'Create your own custom nonogram puzzles from images. Free online tool to generate, customize, and download picture puzzles.',
+    ogImage: '/og-image.jpg',
+    twitterCard: 'summary_large_image',
+    twitterTitle: 'Create Custom Nonogram Puzzles Online',
+    twitterDescription: 'Transform your images into fun nonogram puzzles with our free online generator. Perfect for puzzle enthusiasts!',
+    favicon: '/vite.svg',
+  });
+
+  useEffect(() => {
+    // Load saved settings from localStorage
+    const savedSettings = localStorage.getItem('seoSettings');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        setSeoSettings(parsed);
+      } catch (err) {
+        console.error('Error parsing saved settings:', err);
+      }
+    }
+  }, []);
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+      <MetaTags {...seoSettings} />
       {/* Hero Section */}
       <Box 
         sx={{ 
