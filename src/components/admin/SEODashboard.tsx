@@ -6,14 +6,10 @@ import {
   Typography,
   TextField,
   Button,
-  IconButton,
   Snackbar,
   Alert,
   Divider,
-  AppBar,
-  Toolbar,
 } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
 
 interface SEOSettings {
   title: string;
@@ -47,6 +43,10 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
   const [settings, setSettings] = useState<SEOSettings>(defaultSEOSettings);
   const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState('');
+
+  const handleLogout = () => {
+    onLogout();
+  };
 
   useEffect(() => {
     // Load saved settings from localStorage

@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 interface NonogramGridProps {
@@ -10,14 +10,12 @@ interface NonogramGridProps {
 }
 
 const NonogramGrid = ({ rows, cols, grid, showSolution }: NonogramGridProps) => {
-  const theme = useTheme();
   const [cellSize, setCellSize] = useState(30);
   const maxRowHints = Math.max(...rows.map(r => r.length));
   const maxColHints = Math.max(...cols.map(c => c.length));
   
   // Calculate total grid dimensions
   const totalCols = maxRowHints + grid[0].length;
-  const totalRows = maxColHints + grid.length;
 
   // Update cell size based on container width
   useEffect(() => {

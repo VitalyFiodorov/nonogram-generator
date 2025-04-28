@@ -51,7 +51,7 @@ const NonogramGenerator = () => {
 
     // Use gridSize as the target dimension for the longer side
     const aspectRatio = img.width / img.height;
-    let targetWidth, targetHeight;
+    let targetWidth: number, targetHeight: number;
     
     if (aspectRatio > 1) {
       targetWidth = gridSize;
