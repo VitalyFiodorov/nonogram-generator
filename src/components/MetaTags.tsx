@@ -49,13 +49,19 @@ const MetaTags = ({
 
   return (
     <Helmet>
+      {/* Remove existing favicon links */}
+      <link rel="icon" href="" />
+      <link rel="shortcut icon" href="" />
+      <link rel="apple-touch-icon" href="" />
+
       {/* Basic SEO */}
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
 
-      {/* Favicon - remove existing and add new */}
+      {/* Add new favicon */}
       <link rel="icon" type={getFaviconType(favicon)} href={favicon} />
+      <link rel="shortcut icon" type={getFaviconType(favicon)} href={favicon} />
 
       {/* Open Graph */}
       <meta property="og:title" content={ogTitle} />

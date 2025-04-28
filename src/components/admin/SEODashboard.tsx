@@ -49,6 +49,7 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
   const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState('');
   const faviconInputRef = useRef<HTMLInputElement>(null);
+  const [isMetaTagsUpdated, setIsMetaTagsUpdated] = useState(false);
 
   const handleLogout = () => {
     onLogout();
@@ -61,6 +62,7 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
       try {
         const parsed = JSON.parse(savedSettings);
         setSettings(parsed);
+        setIsMetaTagsUpdated(true); // Trigger initial meta tags update
       } catch (err) {
         console.error('Error parsing saved settings:', err);
         setSettings(defaultSEOSettings);
@@ -90,7 +92,8 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
       reader.onload = (e) => {
         const result = e.target?.result;
         if (typeof result === 'string') {
-          setSettings({ ...settings, favicon: result });
+          setSettings(prev => ({ ...prev, favicon: result }));
+          setIsMetaTagsUpdated(true); // Trigger meta tags update
         }
       };
       reader.onerror = () => {
@@ -106,6 +109,15 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
     try {
       localStorage.setItem('seoSettings', JSON.stringify(settings));
       setIsSaved(true);
+      setIsMetaTagsUpdated(true); // Trigger meta tags update
+      
+      // Force favicon refresh
+      const links = document.getElementsByTagName('link');
+      for (let i = 0; i < links.length; i++) {
+        if (links[i].rel === 'icon' || links[i].rel === 'shortcut icon') {
+          links[i].href = settings.favicon + '?v=' + new Date().getTime();
+        }
+      }
     } catch (err) {
       setError('Failed to save settings');
     }
@@ -113,11 +125,12 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   const handleReset = () => {
     setSettings(defaultSEOSettings);
+    setIsMetaTagsUpdated(true); // Trigger meta tags update
   };
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100' }}>
-      <MetaTags {...settings} />
+      {isMetaTagsUpdated && <MetaTags {...settings} />}
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={2} sx={{ p: 4 }}>
@@ -153,7 +166,7 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
                   />
                   <input
                     type="file"
-                    accept=".ico,.png,.jpg,.jpeg"
+                    accept=".ico,.png,.jpg,.jpeg,.svg"
                     ref={faviconInputRef}
                     style={{ display: 'none' }}
                     onChange={handleFaviconUpload}
