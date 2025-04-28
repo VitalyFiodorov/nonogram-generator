@@ -11,6 +11,7 @@ interface MetaTagsProps {
   twitterCard: string;
   twitterTitle: string;
   twitterDescription: string;
+  favicon: string;
 }
 
 const MetaTags = ({
@@ -23,6 +24,7 @@ const MetaTags = ({
   twitterCard,
   twitterTitle,
   twitterDescription,
+  favicon,
 }: MetaTagsProps) => {
   return (
     <Helmet>
@@ -30,6 +32,7 @@ const MetaTags = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
+      <link rel="icon" type="image/x-icon" href={favicon} />
 
       {/* Open Graph */}
       <meta property="og:title" content={ogTitle} />
