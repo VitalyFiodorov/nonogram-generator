@@ -41,7 +41,7 @@ const defaultSEOSettings: SEOSettings = {
   twitterCard: 'summary_large_image',
   twitterTitle: 'Create Custom Nonogram Puzzles Online',
   twitterDescription: 'Transform your images into fun nonogram puzzles with our free online generator. Perfect for puzzle enthusiasts!',
-  favicon: '/favicon.ico',
+  favicon: '/vite.svg',
 };
 
 const SEODashboard = ({ onLogout }: SEODashboardProps) => {
@@ -58,13 +58,34 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
     // Load saved settings from localStorage
     const savedSettings = localStorage.getItem('seoSettings');
     if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
+      try {
+        const parsed = JSON.parse(savedSettings);
+        setSettings(parsed);
+      } catch (err) {
+        console.error('Error parsing saved settings:', err);
+        setSettings(defaultSEOSettings);
+      }
     }
   }, []);
 
-  const handleFaviconUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFaviconUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    try {
+      // Validate file size (max 1MB)
+      if (file.size > 1024 * 1024) {
+        setError('Favicon file size should be less than 1MB');
+        return;
+      }
+
+      // Validate file type
+      const validTypes = ['image/x-icon', 'image/png', 'image/jpeg', 'image/svg+xml'];
+      if (!validTypes.includes(file.type)) {
+        setError('Invalid file type. Please use ICO, PNG, JPG, or SVG format.');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result;
@@ -72,13 +93,17 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
           setSettings({ ...settings, favicon: result });
         }
       };
+      reader.onerror = () => {
+        setError('Error reading file');
+      };
       reader.readAsDataURL(file);
+    } catch (err) {
+      setError('Error processing file');
     }
   };
 
   const handleSave = () => {
     try {
-      // Save to localStorage
       localStorage.setItem('seoSettings', JSON.stringify(settings));
       setIsSaved(true);
     } catch (err) {
