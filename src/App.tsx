@@ -1,5 +1,6 @@
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import LandingPage from './components/LandingPage';
 import AdminRoute from './components/admin/AdminRoute';
 
@@ -47,15 +48,17 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/admin" element={<AdminRoute />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/admin" element={<AdminRoute />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }
 

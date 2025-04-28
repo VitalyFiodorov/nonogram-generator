@@ -11,6 +11,7 @@ import {
   Divider,
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MetaTags from '../MetaTags';
 
 interface SEOSettings {
   title: string;
@@ -59,20 +60,9 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   const handleSave = () => {
     try {
-      // In a real application, this would be an API call
+      // Save to localStorage
       localStorage.setItem('seoSettings', JSON.stringify(settings));
       setIsSaved(true);
-      
-      // Update meta tags
-      document.title = settings.title;
-      document.querySelector('meta[name="description"]')?.setAttribute('content', settings.description);
-      document.querySelector('meta[name="keywords"]')?.setAttribute('content', settings.keywords);
-      document.querySelector('meta[property="og:title"]')?.setAttribute('content', settings.ogTitle);
-      document.querySelector('meta[property="og:description"]')?.setAttribute('content', settings.ogDescription);
-      document.querySelector('meta[property="og:image"]')?.setAttribute('content', settings.ogImage);
-      document.querySelector('meta[name="twitter:card"]')?.setAttribute('content', settings.twitterCard);
-      document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', settings.twitterTitle);
-      document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', settings.twitterDescription);
     } catch (err) {
       setError('Failed to save settings');
     }
@@ -84,6 +74,8 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100' }}>
+      <MetaTags {...settings} />
+
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={2} sx={{ p: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
