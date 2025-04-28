@@ -10,6 +10,7 @@ import {
   Alert,
   Divider,
 } from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface SEOSettings {
   title: string;
@@ -83,12 +84,19 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100' }}>
-      
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={2} sx={{ p: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            SEO Settings
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h5">SEO Settings</Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleLogout}
+              startIcon={<LogoutIcon />}
+            >
+              Logout
+            </Button>
+          </Box>
           <Divider sx={{ mb: 3 }} />
 
           <Box component="form" noValidate autoComplete="off">
