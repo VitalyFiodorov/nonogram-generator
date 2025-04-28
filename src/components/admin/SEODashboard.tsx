@@ -49,7 +49,6 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
   const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState('');
   const faviconInputRef = useRef<HTMLInputElement>(null);
-  const [isMetaTagsUpdated, setIsMetaTagsUpdated] = useState(false);
 
   const handleLogout = () => {
     onLogout();
@@ -61,12 +60,7 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
-        // Ensure favicon is loaded from localStorage or fallback to default
-        if (!parsed.favicon || parsed.favicon === '') {
-          parsed.favicon = defaultSEOSettings.favicon;
-        }
         setSettings(parsed);
-        setIsMetaTagsUpdated(true);
       } catch (err) {
         console.error('Error parsing saved settings:', err);
         setSettings(defaultSEOSettings);
@@ -92,7 +86,6 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
         return;
       }
 
-      // Pre-load the image to ensure it's valid
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result;
@@ -101,7 +94,6 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
           const img = new Image();
           img.onload = () => {
             setSettings(prev => ({ ...prev, favicon: result }));
-            setIsMetaTagsUpdated(true);
           };
           img.onerror = () => {
             setError('Invalid image file');
@@ -120,14 +112,14 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   const handleSave = () => {
     try {
-      // Ensure we have a valid favicon
-      if (!settings.favicon || settings.favicon === '') {
-        setSettings(prev => ({ ...prev, favicon: defaultSEOSettings.favicon }));
-      }
-      
       localStorage.setItem('seoSettings', JSON.stringify(settings));
       setIsSaved(true);
-      setIsMetaTagsUpdated(true);
+      
+      // Force a favicon refresh by adding a timestamp
+      const favicon = document.querySelector("link[rel='icon']");
+      if (favicon) {
+        favicon.setAttribute('href', settings.favicon + '?t=' + Date.now());
+      }
     } catch (err) {
       setError('Failed to save settings');
     }
@@ -135,12 +127,16 @@ const SEODashboard = ({ onLogout }: SEODashboardProps) => {
 
   const handleReset = () => {
     setSettings(defaultSEOSettings);
-    setIsMetaTagsUpdated(true);
+    // Force a favicon refresh for the default icon
+    const favicon = document.querySelector("link[rel='icon']");
+    if (favicon) {
+      favicon.setAttribute('href', defaultSEOSettings.favicon + '?t=' + Date.now());
+    }
   };
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100' }}>
-      {isMetaTagsUpdated && <MetaTags {...settings} />}
+      <MetaTags {...settings} />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={2} sx={{ p: 4 }}>

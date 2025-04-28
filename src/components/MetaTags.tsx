@@ -27,53 +27,22 @@ const MetaTags = ({
   favicon,
 }: MetaTagsProps) => {
   useEffect(() => {
-    // Create a new link element
-    const link = document.createElement('link');
-    link.rel = 'icon';
-    link.type = getFaviconType(favicon);
-    
-    // Add onload handler to remove old favicon only after new one is loaded
-    link.onload = () => {
-      // Remove all existing favicons
-      const existingFavicons = document.querySelectorAll("link[rel*='icon']");
-      existingFavicons.forEach(favicon => favicon !== link && favicon.remove());
-    };
-
-    // Set href last to trigger load
-    link.href = favicon + '?v=' + new Date().getTime();
-
-    // Add the new favicon to head
-    document.head.appendChild(link);
-
-    return () => {
-      // Cleanup on unmount
-      if (document.head.contains(link)) {
-        document.head.removeChild(link);
+    // Find the initial favicon link
+    const initialFavicon = document.querySelector("link[rel='icon']");
+    if (initialFavicon) {
+      // Update the href of the existing favicon link
+      initialFavicon.setAttribute('href', favicon);
+      // Update the type based on the file
+      if (favicon.endsWith('.svg')) {
+        initialFavicon.setAttribute('type', 'image/svg+xml');
+      } else if (favicon.startsWith('data:')) {
+        const mimeType = favicon.split(';')[0].split(':')[1];
+        initialFavicon.setAttribute('type', mimeType);
+      } else {
+        initialFavicon.setAttribute('type', 'image/x-icon');
       }
-    };
+    }
   }, [favicon]);
-
-  // Determine favicon type based on data URL or file extension
-  const getFaviconType = (faviconUrl: string) => {
-    if (faviconUrl.startsWith('data:')) {
-      const mimeType = faviconUrl.split(';')[0].split(':')[1];
-      return mimeType;
-    }
-    const extension = faviconUrl.split('.').pop()?.toLowerCase();
-    switch (extension) {
-      case 'svg':
-        return 'image/svg+xml';
-      case 'ico':
-        return 'image/x-icon';
-      case 'png':
-        return 'image/png';
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      default:
-        return 'image/x-icon';
-    }
-  };
 
   return (
     <Helmet>
